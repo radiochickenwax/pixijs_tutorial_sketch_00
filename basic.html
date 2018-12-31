@@ -1,100 +1,111 @@
 <!doctype html>
-<html>
-    <head>
-	<meta charset="utf-8">
-	<title>Hello World</title>
-	<style>* {padding: 0; margin: 0}</style>
-    </head>
-    
-    <script src="pixi/pixi.min.js"></script>
-    <body>
-	<script type="text/javascript">
-	 let type = "WebGL"
-	 if(!PIXI.utils.isWebGLSupported()){
-	     type = "canvas"
-	 }
+<meta charset="utf-8">
+<title>Make a sprite from a texture atlas</title>
+<body>
+    <script src="../pixi/pixi.min.js"></script>
+    <script>
 
-	 PIXI.utils.sayHello(type)
+     //Aliases
+     let Application = PIXI.Application,
+	 Container = PIXI.Container,
+	 loader = PIXI.loader,
+	 resources = PIXI.loader.resources,
+	 TextureCache = PIXI.utils.TextureCache,
+	 Sprite = PIXI.Sprite,
+	 Rectangle = PIXI.Rectangle;
 
-	 //Aliases
-	 let Application = PIXI.Application,
-	     loader = PIXI.loader,
-	     resources = PIXI.loader.resources,
-	     TextureCache = PIXI.utils.TextureCache,
-	     Rectangle = PIXI.Rectangle,
-	     Sprite = PIXI.Sprite;
+     //Create a Pixi Application
+     let app = new Application({ 
+	 width: 512, 
+	 height: 512,                       
+	 antialias: true, 
+	 transparent: false, 
+	 resolution: 1
+     }
+     );
 
-	 
-	 //Create a Pixi Application
-	 let app = new PIXI.Application({ 
-	     width: 256,         // default: 800
-	     height: 256,        // default: 600
-	     antialias: true,    // default: false
-	     transparent: false, // default: false
-	     forceCanvas: true,
-	     resolution: 1       // default: 1
-	 }
+     //Add the canvas that Pixi automatically created for you to the HTML document
+     document.body.appendChild(app.view);
+
+     //load a JSON file and run the `setup` function when it's done
+     loader
+	 .add("images/treasureHunter.json")
+	 .load(setup);
+
+     //Define variables that might be used in more 
+     //than one function
+     let dungeon, explorer, treasure, door, id;
+
+     function setup() {
+
+	 //There are 3 ways to make sprites from textures atlas frames
+
+	 //1. Access the `TextureCache` directly
+	 let dungeonTexture = TextureCache["dungeon.png"];
+	 dungeon = new Sprite(dungeonTexture);
+	 app.stage.addChild(dungeon);
+
+	 //2. Access the texture using throuhg the loader's `resources`:
+	 explorer = new Sprite(
+	     resources["images/treasureHunter.json"].textures["explorer.png"]
 	 );
+	 explorer.x = 68;
 
-	 app.renderer.backgroundColor = 0x061639;
-	 app.renderer.autoResize = true;
-	 app.renderer.resize(512, 512);
+	 //Center the explorer vertically
+	 explorer.y = app.stage.height / 2 - explorer.height / 2;
+	 app.stage.addChild(explorer);
 
-	 // fill entire window
-	 app.renderer.view.style.position = "absolute";
-	 app.renderer.view.style.display = "block";
-	 app.renderer.autoResize = true;
-	 app.renderer.resize(window.innerWidth, window.innerHeight);
-
-	 // 
-	 //Add the canvas that Pixi automatically created for you to the HTML document
-	 document.body.appendChild(app.view);
-
-	 //load an image and run the `setup` function when it's done
-	 /* PIXI.loader
-	    .add("images/cat.png")
-	    .load(setup); */
-
-	 /* loader
-	    .add("images/tileset.png")
-	    .load(setup); */
-
-	 loader
-	     .add("images/treasureHunter.json")
-	     .load(setup);
+	 //3. Create an optional alias called `id` for all the texture atlas 
+	 //frame id textures.
+	 id = PIXI.loader.resources["images/treasureHunter.json"].textures; 
 	 
-	 //This `setup` function will run when the image has loaded
-	 function setup() {
-	     //There are 3 ways to make sprites from textures atlas frames
+	 //Make the treasure box using the alias
+	 treasure = new Sprite(id["treasure.png"]);
+	 app.stage.addChild(treasure);
 
-	     //1. Access the `TextureCache` directly
-	     let dungeonTexture = TextureCache["dungeon.png"];
-	     dungeon = new Sprite(dungeonTexture);
-	     app.stage.addChild(dungeon);
+	 //Position the treasure next to the right edge of the canvas
+	 treasure.x = app.stage.width - treasure.width - 48;
+	 treasure.y = app.stage.height / 2 - treasure.height / 2;
+	 app.stage.addChild(treasure);
 
-	     //2. Access the texture using through the loader's `resources`:
-	     explorer = new Sprite(
-		 resources["images/treasureHunter.json"].textures["explorer.png"]
-	     );
-	     explorer.x = 68;
+	 //Make the exit door
+	 door = new Sprite(id["door.png"]); 
+	 door.position.set(32, 0);
+	 app.stage.addChild(door);
 
-	     //Center the explorer vertically
-	     explorer.y = app.stage.height / 2 - explorer.height / 2;
-	     app.stage.addChild(explorer);
+	 //Make the blobs
+	 let numberOfBlobs = 6,
+	     spacing = 48,
+	     xOffset = 150;
 
-	     //3. Create an optional alias called `id` for all the texture atlas 
-	     //frame id textures.
-	     id = PIXI.loader.resources["images/treasureHunter.json"].textures; 
-	     
-	     //Make the treasure box using the alias
-	     treasure = new Sprite(id["treasure.png"]);
-	     app.stage.addChild(treasure);
+	 //Make as many blobs as there are `numberOfBlobs`
+	 for (let i = 0; i < numberOfBlobs; i++) {
 
-	     //Position the treasure next to the right edge of the canvas
-	     treasure.x = app.stage.width - treasure.width - 48;
-	     treasure.y = app.stage.height / 2 - treasure.height / 2;
-	     app.stage.addChild(treasure);
+	     //Make a blob
+	     let blob = new Sprite(id["blob.png"]);
+
+	     //Space each blob horizontally according to the `spacing` value.
+	     //`xOffset` determines the point from the left of the screen
+	     //at which the first blob should be added.
+	     let x = spacing * i + xOffset;
+
+	     //Give the blob a random y position
+	     //(`randomInt` is a custom function - see below)
+	     let y = randomInt(0, app.stage.height - blob.height);
+
+	     //Set the blob's position
+	     blob.x = x;
+	     blob.y = y;
+
+	     //Add the blob sprite to the stage
+	     app.stage.addChild(blob);
 	 }
-	</script>
-    </body>
-</html>
+     }
+
+     //The `randomInt` helper function
+     function randomInt(min, max) {
+	 return Math.floor(Math.random() * (max - min + 1)) + min;
+     }
+
+    </script>
+</body>
