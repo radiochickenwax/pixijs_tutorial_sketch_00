@@ -20,6 +20,8 @@
 	 let Application = PIXI.Application,
 	     loader = PIXI.loader,
 	     resources = PIXI.loader.resources,
+	     TextureCache = PIXI.utils.TextureCache,
+	     Rectangle = PIXI.Rectangle,
 	     Sprite = PIXI.Sprite;
 
 	 
@@ -49,43 +51,39 @@
 	 document.body.appendChild(app.view);
 
 	 //load an image and run the `setup` function when it's done
-	 PIXI.loader
-	     .add("images/cat.png")
-	     .load(setup);
+	 /* PIXI.loader
+	    .add("images/cat.png")
+	    .load(setup); */
 
+	 loader
+	     .add("images/tileset.png")
+	     .load(setup);
+	 
 	 //This `setup` function will run when the image has loaded
 	 function setup() {
+	     //Create the `tileset` sprite from the texture
+	     let texture = TextureCache["images/tileset.png"];
 
-	     //Create the cat sprite
-	     let cat = new Sprite(PIXI.loader.resources["images/cat.png"].texture);
+	     //Create a rectangle object that defines the position and
+	     //size of the sub-image you want to extract from the texture
+	     //(`Rectangle` is an alias for `PIXI.Rectangle`)
+	     let rectangle = new Rectangle(192, 128, 64, 64);
 
-	     //Change the sprite's position
-	     cat.x = 96;
-	     cat.y = 96;
+	     //Tell the texture to use that rectangular section
+	     texture.frame = rectangle;
 
-	     //Change the sprite's size
-	     // cat.width = 80;  // width/height works and so does scale.set(x,y)
-	     // cat.height = 120;
-	     cat.scale.set(2,2);
+	     //Create the sprite from the texture
+	     let rocket = new Sprite(texture);
 
-	     // rotate in radians about an anchor
-	     cat.rotation = 0.5;
-	     // The anchor.x and anchor.y values represent a percentage of the texture’s dimensions, from 0 to 1 (0% to 100%).
-	     // Setting it to 0.5 centers the texture over the point.
-	     // The location of the point itself won’t change, just the way the texture is positioned over it.
-	     // cat.anchor.x = 0.5;
-	     //cat.anchor.y = 0.5;
-	     //cat.anchor.set(100, 100);
-	     cat.anchor.set(0.5,0.5);
-	     /*
-		Sprites also have a pivot property which works in a similar way to anchor. pivot sets the position of the sprite's x/y origin point. If you change the pivot point and then rotate the sprite, it will rotate around that origin point. For example, the following code will set the sprite's pivot.x point to 32, and its pivot.y point to 32
-	      */
+	     //Position the rocket sprite on the canvas
+	     rocket.x = 32;
+	     rocket.y = 32;
 
-	     cat.pivot.set(32, 32);
-
+	     //Add the rocket to the stage
+	     app.stage.addChild(rocket);
 	     
-	     //Add the cat to the stage
-	     app.stage.addChild(cat);
+	     //Render the stage   
+	     app.renderer.render(app.stage);
 	 }
 	</script>
     </body>
