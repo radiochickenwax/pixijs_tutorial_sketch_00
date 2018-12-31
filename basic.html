@@ -16,6 +16,13 @@
 
 	 PIXI.utils.sayHello(type)
 
+	 //Aliases
+	 let Application = PIXI.Application,
+	     loader = PIXI.loader,
+	     resources = PIXI.loader.resources,
+	     Sprite = PIXI.Sprite;
+
+	 
 	 //Create a Pixi Application
 	 let app = new PIXI.Application({ 
 	     width: 256,         // default: 800
@@ -50,8 +57,12 @@
 	 function setup() {
 
 	     //Create the cat sprite
-	     let cat = new PIXI.Sprite(PIXI.loader.resources["images/cat.png"].texture);
-	     
+	     let cat = new Sprite(PIXI.loader.resources["images/cat.png"].texture);
+
+	     //Change the sprite's position
+	     cat.x = 96;
+	     cat.y = 96;
+
 	     //Add the cat to the stage
 	     app.stage.addChild(cat);
 	 }
