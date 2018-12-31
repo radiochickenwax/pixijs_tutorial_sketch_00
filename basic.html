@@ -64,9 +64,15 @@
 	     cat.y = 96;
 
 	     //Change the sprite's size
-	     cat.width = 80;
-	     cat.height = 120;
+	     // cat.width = 80;  // width/height works and so does scale.set(x,y)
+	     // cat.height = 120;
+	     cat.scale.set(2,2);
 
+	     // rotate in radians about an anchor
+	     cat.rotation = 0.5;
+	     cat.anchor.x = 0.5;
+	     cat.anchor.y = 0.5;
+	     
 	     //Add the cat to the stage
 	     app.stage.addChild(cat);
 	 }
